@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>0vzx</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #000;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 800px;
+    height: 600px;
+  }
+  #imageCanvas {
+    mix-blend-mode: overlay; 
+  }
+</style>
+</head>
+<body>
+<canvas id="noiseCanvas"></canvas>
+<canvas id="imageCanvas"></canvas>
+
+
+
+<script>
+
+  const noiseCanvas = document.getElementById("noiseCanvas");
+  const noiseCtx = noiseCanvas.getContext("2d");
+  const imageCanvas = document.getElementById("imageCanvas");
+  const imageCtx = imageCanvas.getContext("2d");
+
+  noiseCanvas.width = imageCanvas.width = window.innerWidth;
+  noiseCanvas.height = imageCanvas.height = window.innerHeight;
+
+  let scale = 2.0;
+
+  const myImg = new Image();
+  myImg.onload = () => {
+    animate();
+  };
+  myImg.src = "logo.svg";
+
+  function generateNoise(width, height) {
+    const imageData = noiseCtx.createImageData(width, height);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const value = Math.floor(Math.random() * 255);
+      data[i]     = value; // punainen
+      data[i + 1] = value; // vihreä
+      data[i + 2] = value; // sininen
+      data[i + 3] = 255;   // alpha
+    }
+    return imageData;
+  }
+
+  function animate() {
+    const noiseData = generateNoise(noiseCanvas.width, noiseCanvas.height);
+    noiseCtx.putImageData(noiseData, 0, 0);
+
+    imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+    const scaledWidth = myImg.width * scale;
+    const scaledHeight = myImg.height * scale;
+    const x = (imageCanvas.width - scaledWidth) / 2;
+    const y = (imageCanvas.height - scaledHeight) / 2;
+    imageCtx.drawImage(myImg, x, y, scaledWidth, scaledHeight);
+
+    requestAnimationFrame(animate);
+  }
+</script>
+
+</body>
